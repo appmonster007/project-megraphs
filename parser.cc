@@ -60,7 +60,7 @@ namespace parser {
         return table;
     }
     std::vector<std::vector<double>> readMTXFile(std::string & fileName) {
-        int rows, columns, lines;
+        long rows, columns, lines;
         std::ifstream in(fileName);
         while (in.peek() == '%')
             in.ignore(2048, '\n');
@@ -69,9 +69,9 @@ namespace parser {
         for (int i = 0; i < lines; i++)
         {
             double data;
-            int row, col;
+            double row, col;
             in>>row>>col>>data;
-            matrix[row][col] = data;
+            matrix[row-1][col-1] = data;
         }
         in.close();
         return matrix;
