@@ -46,8 +46,7 @@ namespace parser {
         return fields;
     }
     std::vector<std::vector<std::string>> readCSVFile(std::string &fileName) {
-        std::ifstream in;
-        in.open(fileName);
+        std::ifstream in(fileName);
         std::vector<std::vector<std::string>> table;
         std::string row;
         while (!in.eof()) {
@@ -59,5 +58,22 @@ namespace parser {
             table.push_back(fields);
         }
         return table;
+    }
+    std::vector<std::vector<double>> readMTXFile(std::string & fileName) {
+        int rows, columns, lines;
+        std::ifstream in(fileName);
+        while (in.peek() == '%')
+            in.ignore(2048, '\n');
+        in >> rows >> columns >> lines;
+        std::vector<std::vector<double>> matrix(rows, std::vector<double> (columns, 0));
+        for (int i = 0; i < lines; i++)
+        {
+            double data;
+            int row, col;
+            in>>row>>col>>data;
+            matrix[row][col] = data;
+        }
+        in.close();
+        return matrix;
     }
 }
