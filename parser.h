@@ -11,7 +11,7 @@ namespace parser {
         QuotedQuote
     };
     std::vector<std::string> readCSVRow(const std:: string& row);
-    std::vector<std::vector<std::string>> readCSVFile(std::string fileName);
+    std::vector<std::vector<std::string>> readCSVFile(std::string & fileName);
 }
 
 #endif
