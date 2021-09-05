@@ -7,6 +7,7 @@
 #include "edge_list.hpp"
 #include "adjacency_list.hpp"
 #include "adjacency_matrix.hpp"
+#include "Eigen/Sparse"
 namespace parser {
     enum class CSVState {
         UnquotedField,
@@ -14,8 +15,8 @@ namespace parser {
         QuotedQuote
     };
     std::vector<std::string> readCSVRow(const std:: string& row);
-    std::vector<std::vector<std::string>> readCSVFile(std::string & fileName);
-    std::vector<std::vector<double>> readMTXFile(std::string & fileName);
+    Eigen::SparseMatrix<double> readCSVFile(std::string & fileName);
+    Eigen::SparseMatrix<double> readMTXFile(std::string & fileName);
 }
 
 #endif
