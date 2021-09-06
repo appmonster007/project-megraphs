@@ -4,10 +4,7 @@
 #include<iterator>
 #include<fstream>
 #include<vector>
-#include "edge_list.hpp"
-#include "adjacency_list.hpp"
-#include "adjacency_matrix.hpp"
-#include "Eigen/Sparse"
+#include <Eigen/Sparse>
 namespace parser {
     enum class CSVState {
         UnquotedField,
@@ -17,6 +14,7 @@ namespace parser {
     std::vector<std::string> readCSVRow(const std:: string& row);
     Eigen::SparseMatrix<double> readCSVFile(std::string & fileName);
     Eigen::SparseMatrix<double> readMTXFile(std::string & fileName);
+    bool isNull(const Eigen::SparseMatrix<T>& mat, int row, int col);
 }
 
 #endif

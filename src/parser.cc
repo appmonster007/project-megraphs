@@ -63,7 +63,7 @@ namespace parser {
         }
         Eigen::SparseMatrix<double> matrix(max, max);
         in.close();
-        std::ifstream in(fileName);
+        in.open(fileName);
         std::getline(in, row);
         while (!in.eof()) {
             std::getline(in, row);
@@ -82,7 +82,6 @@ namespace parser {
             in.ignore(2048, '\n');
         in >> rows >> columns >> lines;
         Eigen::SparseMatrix<double> matrix(rows, columns);
-        std::vector<std::vector<double>> matrix(rows, std::vector<double> (columns, 0));
         for (int i = 0; i < lines; i++)
         {
             double data;
