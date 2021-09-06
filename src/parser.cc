@@ -2,7 +2,7 @@
 #include<iterator>
 #include<fstream>
 #include<vector>
-#include "parser.h"
+#include "include/parser.h"
 namespace parser {
     std::vector<std::string> readCSVRow(const std::string &row) {
         CSVState state = CSVState::UnquotedField;
@@ -45,33 +45,50 @@ namespace parser {
         }
         return fields;
     }
-    std::vector<std::vector<std::string>> readCSVFile(std::string &fileName) {
+    Eigen::SparseMatrix<double> readCSVFile(std::string &fileName) {
         std::ifstream in(fileName);
         std::vector<std::vector<std::string>> table;
         std::string row;
+        long int max = 0;
+        std::getline(in, row);
+        while(!in.eof()) {
+            std::getline(in, row);
+            if(in.bad() || in.fail()) {
+                break;
+            }
+            auto fields = readCSVRow(row);
+            if(std::stol(fields[0]) > max) {
+                max = std::stol(fields[0]);
+            }
+        }
+        Eigen::SparseMatrix<double> matrix(max, max);
+        in.close();
+        std::ifstream in(fileName);
+        std::getline(in, row);
         while (!in.eof()) {
             std::getline(in, row);
             if (in.bad() || in.fail()) {
                 break;
             }
             auto fields = readCSVRow(row);
-            table.push_back(fields);
+            matrix.insert(stol(fields[0]), std::stol(fields[1])) = std::stod(fields[3]);
         }
-        return table;
+        return matrix;
     }
-    std::vector<std::vector<double>> readMTXFile(std::string & fileName) {
+    Eigen::SparseMatrix<double> readMTXFile(std::string & fileName) {
         long rows, columns, lines;
         std::ifstream in(fileName);
         while (in.peek() == '%')
             in.ignore(2048, '\n');
         in >> rows >> columns >> lines;
+        Eigen::SparseMatrix<double> matrix(rows, columns);
         std::vector<std::vector<double>> matrix(rows, std::vector<double> (columns, 0));
         for (int i = 0; i < lines; i++)
         {
             double data;
             double row, col;
             in>>row>>col>>data;
-            matrix[row-1][col-1] = data;
+            matrix.insert(row, col) = data;
         }
         in.close();
         return matrix;
