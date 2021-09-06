@@ -3,3 +3,6 @@ boost/1.76.0
 
 [generators]
 cmake
+virtualenv
+virtualrunenv
+cmake_find_package
