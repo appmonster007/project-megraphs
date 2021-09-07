@@ -4,10 +4,7 @@
 #include<iterator>
 #include<fstream>
 #include<vector>
-#include "edge_list.hpp"
-#include "adjacency_list.hpp"
-#include "adjacency_matrix.hpp"
-#include "Eigen/Sparse"
+#include <Eigen/Sparse>
 namespace parser {
     enum class CSVState {
         UnquotedField,
