@@ -14,6 +14,7 @@ namespace parser {
     std::vector<std::string> readCSVRow(const std:: string& row);
     Eigen::SparseMatrix<double> readCSVFile(std::string & fileName);
     Eigen::SparseMatrix<double> readMTXFile(std::string & fileName);
+    Eigen::SparseMatrix<double> readMTXFile(std::string & fileName, int mode);
 }
 
 #endif

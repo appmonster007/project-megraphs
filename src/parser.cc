@@ -62,7 +62,7 @@ namespace parser {
                 max = std::stol(fields[0]);
             }
         }
-        Eigen::SparseMatrix<double> matrix(max+1, max+1);
+        Eigen::SparseMatrix<double> matrix(max, max);
         in.close();
         in.open(fileName);
         std::getline(in, row);
@@ -72,8 +72,8 @@ namespace parser {
                 break;
             }
             auto fields = readCSVRow(row);
-            if(matrix.coeff(stol(fields[0]), std::stol(fields[1])) == 0)
-                matrix.insert(stol(fields[0]), std::stol(fields[1])) = std::stod(fields[3]);
+            if(matrix.coeff(stol(fields[0])-1, std::stol(fields[1])-1) == 0)
+                matrix.insert(stol(fields[0])-1, std::stol(fields[1])-1) = std::stod(fields[3]);
         }
         return matrix;
     }
@@ -83,14 +83,31 @@ namespace parser {
         while (in.peek() == '%')
             in.ignore(2048, '\n');
         in >> rows >> columns >> lines;
-        Eigen::SparseMatrix<double> matrix(rows+1, columns+1);
+        Eigen::SparseMatrix<double> matrix(rows, columns);
+        for (int i = 0; i < lines; i++)
+        {
+            double data;
+            long int row, col;
+            in>>row>>col;
+            matrix.insert(row-1, col-1) = 1;
+            matrix.insert(col-1, row-1) = 1;
+        }
+        in.close();
+        return matrix;
+    }
+    Eigen::SparseMatrix<double> readMTXFile(std::string & fileName, int mode) {
+        long rows, columns, lines;
+        std::ifstream in(fileName);
+        while (in.peek() == '%')
+            in.ignore(2048, '\n');
+        in >> rows >> columns >> lines;
+        Eigen::SparseMatrix<double> matrix(rows, columns);
         for (int i = 0; i < lines; i++)
         {
             double data;
             long int row, col;
             in>>row>>col>>data;
-            if (matrix.coeff(row, col) == 0)
-                matrix.insert(row, col) = data;
+            matrix.insert(row-1, col-1) = data;
         }
         in.close();
         return matrix;
