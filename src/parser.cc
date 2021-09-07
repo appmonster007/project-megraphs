@@ -108,7 +108,6 @@ namespace parser {
             long int row, col;
             in>>row>>col>>data;
             matrix.insert(row-1, col-1) = data;
-            matrix.insert(col-1, row-1) = data;
         }
         in.close();
         return matrix;
