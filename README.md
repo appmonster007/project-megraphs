@@ -18,3 +18,14 @@ Made with [contributors-img](https://contrib.rocks).
 
 ### Install conan
 - refer to this link to [get started](https://docs.conan.io/en/latest/getting_started.html)
+
+### Build excutable
+
+- For 1st time
+```sh
+% mkdir build && cd build
+% conan install ../src --build=missing 
+% cmake ../src -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+% cmake --build .
+% ./bin/<projectName>
+```
