@@ -1,6 +1,7 @@
 #include<string>
 #include<iterator>
 #include<fstream>
+#include<iostream>
 #include<vector>
 #include "include/parser.h"
 namespace parser {
@@ -61,7 +62,7 @@ namespace parser {
                 max = std::stol(fields[0]);
             }
         }
-        Eigen::SparseMatrix<double> matrix(max, max);
+        Eigen::SparseMatrix<double> matrix(max+1, max+1);
         in.close();
         in.open(fileName);
         std::getline(in, row);
@@ -71,7 +72,8 @@ namespace parser {
                 break;
             }
             auto fields = readCSVRow(row);
-            matrix.insert(stol(fields[0]), std::stol(fields[1])) = std::stod(fields[3]);
+            if(matrix.coeff(stol(fields[0]), std::stol(fields[1])) == 0)
+                matrix.insert(stol(fields[0]), std::stol(fields[1])) = std::stod(fields[3]);
         }
         return matrix;
     }
@@ -81,13 +83,14 @@ namespace parser {
         while (in.peek() == '%')
             in.ignore(2048, '\n');
         in >> rows >> columns >> lines;
-        Eigen::SparseMatrix<double> matrix(rows, columns);
+        Eigen::SparseMatrix<double> matrix(rows+1, columns+1);
         for (int i = 0; i < lines; i++)
         {
             double data;
-            double row, col;
+            long int row, col;
             in>>row>>col>>data;
-            matrix.insert(row, col) = data;
+            if (matrix.coeff(row, col) == 0)
+                matrix.insert(row, col) = data;
         }
         in.close();
         return matrix;
