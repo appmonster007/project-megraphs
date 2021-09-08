@@ -8,6 +8,6 @@ conan_basic_setup()
 
 add_subdirectory(include)
 
-add_executable(Main main.cc include/parser.h include/parser.cc)
-target_include_directories(Main PUBLIC include)
-target_link_libraries(Main PUBLIC ${CONAN_LIBS})
+add_executable(Main main.cc)
+# target_include_directories(Main PUBLIC include)
+target_link_libraries(Main PUBLIC include ${CONAN_LIBS})

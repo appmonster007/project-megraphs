@@ -1,3 +1,4 @@
 build
 src/include/Eigen
 .vscode
+.DS_store
