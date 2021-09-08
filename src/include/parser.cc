@@ -3,7 +3,7 @@
 #include<fstream>
 #include<iostream>
 #include<vector>
-#include "include/parser.h"
+#include "parser.h"
 namespace parser {
     std::vector<std::string> readCSVRow(const std::string &row) {
         CSVState state = CSVState::UnquotedField;

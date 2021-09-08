@@ -2,7 +2,7 @@
 #include "include/parser.h"
 
 int main() {
-    std::string fileName("soc-karate.mtx");
+    std::string fileName("../assets/soc-karate.mtx");
     Eigen::SparseMatrix<double> data = parser::readMTXFile(fileName);
     Eigen::SparseMatrix<double> * d = new Eigen::SparseMatrix<double>(data);
     fileName = "csvfile.csv";
