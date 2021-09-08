@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.1)
-project(Main)
+project(Main VERSION 0.1.0)
 
 add_definitions("-std=c++11")
 
