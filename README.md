@@ -25,7 +25,7 @@ Made with [contributors-img](https://contrib.rocks).
 ```sh
 % mkdir build && cd build
 % conan install ../src --build=missing 
-% cmake ../src -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
+% cmake ../src -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=[DEBUG|RELEASE]
 % cmake --build .
 % ./bin/<projectName>
 ```

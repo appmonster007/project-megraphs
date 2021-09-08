@@ -1,5 +1,7 @@
 [requires]
 boost/1.76.0
+eigen/3.4.0
+spectra/1.0.0
 
 [generators]
 cmake
