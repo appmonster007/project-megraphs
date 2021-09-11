@@ -1,3 +1,6 @@
+from networkx.algorithms.components.connected import is_connected
+from networkx.classes.function import neighbors
+from networkx.linalg.algebraicconnectivity import fiedler_vector
 import scipy as sp
 import networkx as nx
 from scipy.io import mmread
@@ -20,6 +23,20 @@ class Graph:
         return nx.betweenness_centrality(self.graph)
     def eigenvector_centrality(self):
         return nx.eigenvector_centrality(self.graph)
+    def is_connected(self):
+        return nx.is_connected(self.graph)
+    def lfvc(self):
+        if (not self.is_connected()):
+            return "Not possible"
+        fiedler_vector = nx.fiedler_vector(self.graph)
+        lfvclist = []
+        for i in self.graph.nodes(data = True):
+            lfvcthis = 0
+            for j in self.graph.neighbors(i[0]):
+                lfvcthis += (fiedler_vector[j]-fiedler_vector[i[0]])*(fiedler_vector[j]-fiedler_vector[i[0]])
+            lfvclist.append(lfvcthis)
+        return fiedler_vector
+
 karate = mmread('soc-karate.mtx')
 internet = mmread('tech-internet-as.mtx')
 counter = 0
@@ -45,16 +62,21 @@ print(webedu.get_shape())
 G = Graph(karate)
 G1 = Graph(webedu)
 G2 = Graph(internet)
-#uncomment below to read internet graph instead
-# G=nx.from_scipy_sparse_matrix(internet)
 print("graphs made")
-print(G.adj, G1.adj, G2.adj)
-print(G.laplacian, G1.laplacian, G2.laplacian)
+c = G.is_connected()
+c1 = G1.is_connected()
+print(c)
+print(c1)
+print(G.lfvc())
+print(G1.lfvc())
+print(len(G.graph.nodes()))
 print("made adj matrix")
 dc = G.degree_centrality()
 cc = G.closeness_centrality()
 bc = G.betweenness_centrality()
 ec = G.eigenvector_centrality()
+print("lfvc")
+print(G.lfvc())
 print("Karate")
 print(dc,cc,bc,ec)
 dc1 = G1.degree_centrality()
