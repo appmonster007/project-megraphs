@@ -41,6 +41,8 @@ class Graph:
         for l in range(k):
             nbrs = set((nbr for n in nbrs for nbr in self.graph[n]))
         return len(nbrs)
+    def clustering_coefficient(self):
+        return nx.clustering(self.graph)
 
 karate = mmread('soc-karate.mtx')
 internet = mmread('tech-internet-as.mtx')
@@ -92,7 +94,7 @@ print(dc,cc,bc,ec)
 # print(dc1,cc1,bc1,ec1)
 dc2 = G2.degree_centrality()
 print("degree")
-print(G2.neighbourhood_hopset(0))
+print(G2.neighbourhood_hopset(0,2))
 # cc2 = G2.closeness_centrality()
 # print("closeness")
 bc2 = G2.betweenness_centrality()
