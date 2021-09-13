@@ -1,23 +1,23 @@
 import csv
-file = "../assets/M_web-edu.csv"
-n_file = "../assets/M_web-edu.mtx"
-with open(file,'r') as csvfile:
-    with open(n_file,'a') as mtxfile:
+import functools
+import sys
+ 
+o_file = sys.argv[1]
+n_file = sys.argv[2]
+with open(o_file,'r') as csvfile:
+    with open(n_file,'w') as mtxfile:
         csvreader = csv.reader(csvfile)
-        mtxfile.write("%"+file+"\n")
+        mtxfile.write("%%MatrixMarket matrix coordinate pattern symmetric \n")
         fields = next(csvreader)
-
         rows = []
-
         for row in csvreader:
-            # rows.append(row)
-            k = row[:2]
-            k.append("\n")
-            k = " ".join(k)
+            k = [int(x) for x in row[:2]]
             rows.append(k)
-        
-        mtxfile.writelines(rows)
-
-        print(fields)
-
-        print(len(rows),len(row[0]))
+        max = functools.reduce(lambda a,b: [max(max(a),max(b)),min(min(a),min(b))], rows)
+        mtxfile.write(""+str(max[0])+" "+str(max[0])+" "+str(len(rows))+"\n")
+        rows = [[str(x) for x in r] for r in rows]
+        k=""
+        for i in range(len(rows)):
+            rows[i].append("\n")
+            k += " ".join(rows[i])
+        mtxfile.writelines(k)
