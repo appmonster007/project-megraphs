@@ -60,7 +60,16 @@ class Graph:
         return nx.clustering(self.graph)
     def clustering_coefficient_node(self, node):
         return nx.clustering(self.graph, node)
-    #def ego_centrality()
+    def ego_centrality_node(self, node):
+        g = nx.ego_graph(self.graph, node)
+        nodes = list(g.nodes(data = True))
+        n = node
+        for i in nodes:
+            if i[0] == node:
+                n = i
+                break
+        centrality =  nx.betweenness_centrality(g)
+        return centrality[node]
     def nodes_of_interest(self):
         l = list(nx.degree_centrality(self.graph))
         mean = statistics.mean(l)
@@ -86,6 +95,8 @@ G2 = Graph(internet)
 print("graphs made")
 c = G.is_connected()
 c1 = G1.is_connected()
+print(G.ego_centrality_node(4))
+print("ego graph made")
 print(c)
 print(c1)
 print(G.lfvc_node(0))
@@ -116,14 +127,17 @@ print(dc1,cc1,bc1,ec1)
 dc2 = G2.degree_centrality()
 print("degree")
 print(G2.neighbourhood_hopset(0,2))
-# cc2 = G2.closeness_centrality()
-# print("closeness")
+cc2 = G2.closeness_centrality_node(0)
+print("closeness")
+clc2 = G2.clustering_coefficient_node(0)
+lfvc2 = G2.lfvc_node(0)
+print("lfvc and clustering")
 bc2 = G2.betweenness_centrality()
 print("betweenness")
 ec2 = G2.eigenvector_centrality()
 print("Internet")
 print(dc2,bc2,ec2)
-nx.conductance(G,S:=(5,6))
+# nx.conductance(G,S:=(5,6))
 w,v = eigs(internet)
 print(w)
 print(v)
