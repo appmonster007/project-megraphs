@@ -20,7 +20,7 @@ class Graph:
     def closeness_centrality(self):
         return nx.closeness_centrality(self.graph)
     def betweenness_centrality(self):
-        return nx.betweenness_centrality(self.graph)
+        return nx.betweenness_centrality(self.graph, k = min(self.graph.number_of_nodes() , 500))
     def eigenvector_centrality(self):
         return nx.eigenvector_centrality(self.graph)
     def is_connected(self):
@@ -35,7 +35,14 @@ class Graph:
             for j in self.graph.neighbors(i[0]):
                 lfvcthis += (fiedler_vector[j]-fiedler_vector[i[0]])*(fiedler_vector[j]-fiedler_vector[i[0]])
             lfvclist.append(lfvcthis)
-        return fiedler_vector
+        return lfvclist
+    def neighbourhood_hopset(self, index, k = 10):
+        nbrs = set([index])
+        for l in range(k):
+            nbrs = set((nbr for n in nbrs for nbr in self.graph[n]))
+        return len(nbrs)
+    def clustering_coefficient(self):
+        return nx.clustering(self.graph)
 
 karate = mmread('soc-karate.mtx')
 internet = mmread('tech-internet-as.mtx')
@@ -79,18 +86,22 @@ print("lfvc")
 print(G.lfvc())
 print("Karate")
 print(dc,cc,bc,ec)
-dc1 = G1.degree_centrality()
-cc1 = G1.closeness_centrality()
-bc1 = G1.betweenness_centrality()
-ec1 = G1.eigenvector_centrality()
-print("Web Edu")
-print(dc1,cc1,bc1,ec1)
+# dc1 = G1.degree_centrality()
+# cc1 = G1.closeness_centrality()
+# bc1 = G1.betweenness_centrality()
+# ec1 = G1.eigenvector_centrality()
+# print("Web Edu")
+# print(dc1,cc1,bc1,ec1)
 dc2 = G2.degree_centrality()
-cc2 = G2.closeness_centrality()
+print("degree")
+print(G2.neighbourhood_hopset(0,2))
+# cc2 = G2.closeness_centrality()
+# print("closeness")
 bc2 = G2.betweenness_centrality()
+print("betweenness")
 ec2 = G2.eigenvector_centrality()
 print("Internet")
-print(dc2,cc2,bc2,ec2)
+print(dc2,bc2,ec2)
 nx.conductance(G,S:=(5,6))
 w,v = eigs(internet)
 print(w)
