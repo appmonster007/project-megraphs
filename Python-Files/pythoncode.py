@@ -32,7 +32,9 @@ class Graph:
     def lfvc(self):
         if (not self.is_connected()):
             return "Not possible"
-        fiedler_vector = nx.fiedler_vector(self.graph)
+        eig_values, eig_vectors = eigs(internet)
+        fiedler_pos = np.where(eig_values.real == np.sort(eig_values.real)[1])[0][0]
+        fiedler_vector = np.transpose(eig_vectors)[fiedler_pos]
         lfvclist = []
         for i in self.graph.nodes(data = True):
             lfvcthis = 0
@@ -46,7 +48,10 @@ class Graph:
         lfvcthis = 0
         nodes = list(self.graph.nodes(data = True))
         n = nodes[node]
-        fiedler_vector = nx.fiedler_vector(self.graph)
+        eig_values, eig_vectors = eigs(internet)
+        fiedler_pos = np.where(eig_values.real == np.sort(eig_values.real)[1])[0][0]
+        fiedler_vector = np.transpose(eig_vectors)[fiedler_pos]
+        print("Found fiefler")
         fiedler = fiedler_vector[n[0]]
         for j in self.graph.neighbors(n[0]):
             lfvcthis += (fiedler_vector[j]-fiedler)*(fiedler_vector[j]-fiedler)
@@ -100,7 +105,7 @@ print("ego graph made")
 print(c)
 print(c1)
 print(G.lfvc_node(0))
-print(G1.lfvc_node(0))
+print(G2.lfvc_node(0))
 print(len(G.graph.nodes()))
 print("made adj matrix")
 print(G1.nodes_of_interest())
