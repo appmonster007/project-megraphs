@@ -1,3 +1,4 @@
+from os import stat
 from networkx.algorithms.components.connected import is_connected
 from networkx.classes.function import neighbors
 from networkx.linalg.algebraicconnectivity import fiedler_vector
@@ -9,6 +10,7 @@ from scipy.sparse.linalg import eigs
 from numpy import linalg as LA
 import numpy as np
 import csv
+import statistics
 
 class Graph:
     def __init__(self, sparse):
@@ -19,6 +21,8 @@ class Graph:
         return nx.degree_centrality(self.graph)
     def closeness_centrality(self):
         return nx.closeness_centrality(self.graph)
+    def closeness_centrality_node(self, node):
+        return nx.closeness_centrality(self.graph, node)
     def betweenness_centrality(self):
         return nx.betweenness_centrality(self.graph, k = min(self.graph.number_of_nodes() , 500))
     def eigenvector_centrality(self):
@@ -36,6 +40,17 @@ class Graph:
                 lfvcthis += (fiedler_vector[j]-fiedler_vector[i[0]])*(fiedler_vector[j]-fiedler_vector[i[0]])
             lfvclist.append(lfvcthis)
         return lfvclist
+    def lfvc_node(self, node):
+        if (not self.is_connected()):
+            return "Not possible"
+        lfvcthis = 0
+        nodes = list(self.graph.nodes(data = True))
+        n = nodes[node]
+        fiedler_vector = nx.fiedler_vector(self.graph)
+        fiedler = fiedler_vector[n[0]]
+        for j in self.graph.neighbors(n[0]):
+            lfvcthis += (fiedler_vector[j]-fiedler)*(fiedler_vector[j]-fiedler)
+        return lfvcthis
     def neighbourhood_hopset(self, index, k = 10):
         nbrs = set([index])
         for l in range(k):
@@ -43,28 +58,34 @@ class Graph:
         return len(nbrs)
     def clustering_coefficient(self):
         return nx.clustering(self.graph)
+    def clustering_coefficient_node(self, node):
+        return nx.clustering(self.graph, node)
+    def ego_centrality_node(self, node):
+        g = nx.ego_graph(self.graph, node)
+        nodes = list(g.nodes(data = True))
+        n = node
+        for i in nodes:
+            if i[0] == node:
+                n = i
+                break
+        centrality =  nx.betweenness_centrality(g)
+        return centrality[node]
+    def nodes_of_interest(self):
+        l = list(nx.degree_centrality(self.graph))
+        mean = statistics.mean(l)
+        median = statistics.median_high(l)
+        closest_mean = min(l, key = lambda x:abs(x-mean))
+        max_value = max(l)
+        min_value = min(l)
+        return l.index(median), l.index(closest_mean), l.index(min_value), l.index(max_value)
 
-karate = mmread('../assets/S_soc-karate.mtx')
-internet = mmread('../assets/L_tech-internet-as.mtx')
-# counter = 0
-# rowindices = []
-# colindices = []
-# datacsv = []
-# with open('../assets/M_web-edu.csv') as csvfile:
-#     csvreader = csv.reader(csvfile, delimiter = ' ', quotechar= '|')
-#     next(csvreader)
-#     for row in csvreader:
-#         row = row[0].split(',')
-#         rowindices.append(int(row[0]))
-#         colindices.append(int(row[1]))
-#         datacsv.append(int(row[3]))
-#         counter += 1
-# print(rowindices[1],colindices[1],datacsv[1], len(rowindices), len(colindices), len(datacsv), counter)
-# print(counter)
-# print(len(rowindices), len(colindices), len(datacsv))
-# print([(counter//2, counter//2)])
-# webedu = coo_matrix((datacsv, (rowindices, colindices)), (counter//2, counter//2))
-webedu = mmread('../assets/M_web-edu.mtx')
+karate = mmread('soc-karate.mtx')
+internet = mmread('tech-internet-as.mtx')
+counter = 0
+rowindices = []
+colindices = []
+datacsv = []
+webedu = mmread('web-edu.mtx')
 print((webedu.shape[0]))
 print(webedu.get_shape())
 
@@ -74,37 +95,49 @@ G2 = Graph(internet)
 print("graphs made")
 c = G.is_connected()
 c1 = G1.is_connected()
+print(G.ego_centrality_node(4))
+print("ego graph made")
 print(c)
 print(c1)
-print(G.lfvc())
-print(G1.lfvc())
+print(G.lfvc_node(0))
+print(G1.lfvc_node(0))
 print(len(G.graph.nodes()))
 print("made adj matrix")
+print(G1.nodes_of_interest())
+print(G.nodes_of_interest())
+print(G2.nodes_of_interest())
+print("Nodes of interest")
 dc = G.degree_centrality()
 cc = G.closeness_centrality()
 bc = G.betweenness_centrality()
 ec = G.eigenvector_centrality()
+clc = G.clustering_coefficient_node(0)
 print("lfvc")
 print(G.lfvc())
 print("Karate")
 print(dc,cc,bc,ec)
-# dc1 = G1.degree_centrality()
-# cc1 = G1.closeness_centrality()
-# bc1 = G1.betweenness_centrality()
-# ec1 = G1.eigenvector_centrality()
-# print("Web Edu")
-# print(dc1,cc1,bc1,ec1)
+print("Clusters of node 1")
+print(clc)
+dc1 = G1.degree_centrality()
+cc1 = G1.closeness_centrality_node(0)
+bc1 = G1.betweenness_centrality()
+ec1 = G1.eigenvector_centrality()
+print("Web Edu")
+print(dc1,cc1,bc1,ec1)
 dc2 = G2.degree_centrality()
 print("degree")
 print(G2.neighbourhood_hopset(0,2))
-# cc2 = G2.closeness_centrality()
-# print("closeness")
+cc2 = G2.closeness_centrality_node(0)
+print("closeness")
+clc2 = G2.clustering_coefficient_node(0)
+lfvc2 = G2.lfvc_node(0)
+print("lfvc and clustering")
 bc2 = G2.betweenness_centrality()
 print("betweenness")
 ec2 = G2.eigenvector_centrality()
 print("Internet")
 print(dc2,bc2,ec2)
-nx.conductance(G,S:=(5,6))
+# nx.conductance(G,S:=(5,6))
 w,v = eigs(internet)
 print(w)
 print(v)
