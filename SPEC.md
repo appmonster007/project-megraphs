@@ -26,6 +26,6 @@ We can use this section to mantain docs of the current state of the program. The
 
 ### Available Functionality
 - Graph Base class
-    - (Proposes)
+    - (Proposed)
 - Centralities
     - (Proposed)
