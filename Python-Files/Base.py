@@ -18,8 +18,11 @@ class GraphBase:
         Allows users to read graph data from mtx files.
         the mtx file represents the graph in adjacency matrix form.
         """
+        print(f"[INFO] attempting to read from {filepath}")
         spmat: coo_matrix = mmread(filepath)
+        print(f"[INFO] read to sparse matrix")
         self.graph = nx.from_scipy_sparse_matrix(spmat)
+        print(f"[INFO] constructed networkx graph")
 
     def draw_to_png(self, outpath: str, label: str = None):
         """
