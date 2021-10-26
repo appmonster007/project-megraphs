@@ -21,14 +21,23 @@ class GraphBase:
         spmat: coo_matrix = mmread(filepath)
         self.graph = nx.from_scipy_sparse_matrix(spmat)
 
-    def draw_to_png(self, outpath: str):
+    def draw_to_png(self, outpath: str, label: str = None):
         """
         Draws the graph to png image
         """
         assert outpath[-4:] == ".png", f"[ERROR] unexpected output file format recieved {outpath[-4:]} expected .png"
         if (self.graph):
+            # generate the graph layout
+            # Easier to log stuff this way
+            print('[INFO] attempting to generate nodes/edges layout')
             pos = nx.kamada_kawai_layout(self.graph)
-            nx.draw(self.graph, pos)
+            print('[INFO] nodes/Edges layout generated')
+            if label:
+                print(f"[INFO] using key {label} to label nodes")
+                labelset = nx.get_node_attributes(self.graph, label)
+                nx.draw(self.graph, pos, labels=labelset)
+            else:
+                nx.draw(self.graph, pos)
             plt.savefig(outpath)
         else:
             print("[WARN] cannot draw undefined graph to image")
