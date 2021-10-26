@@ -9,3 +9,7 @@ src/include/Eigen
 
 # Python3 virtual environment
 venv
+
+__pycache__
+.ipynb_checkpoints
+*/.ipynb_checkpoints/*
