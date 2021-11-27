@@ -1,7 +1,7 @@
-from Base import GraphBase
+from Base import graphIO
 import networkx as nx
 
-def fluidsim(graph: GraphBase, iters=100):
+def fluidsim(graph: graphIO, iters=100):
     for node in graph.graph:
         if graph.graph.degree[node] < 2:
             graph.graph.nodes[node]['pressure'] = 1.0
