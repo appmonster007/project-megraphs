@@ -17,7 +17,7 @@ I was hoping we could have one file to document the code spec we wil be using, s
     - .gitignore
 
 ## Code layout
-For the code I thought of having the very basic graph functions in a ```GraphBase``` class. The ```GraphBase``` class will be simple and will only provide us with functionality that we might want to use on multiple graphs  for multiple purposes. Eg: reading from file, writing details to files etc etc. At the very least these two operations should be supported in one form or another.
+For the code I thought of having the very basic graph functions in a ```graphIO``` class. The ```graphIO``` class will be simple and will only provide us with functionality that we might want to use on multiple graphs  for multiple purposes. Eg: reading from file, writing details to files etc etc. At the very least these two operations should be supported in one form or another.
 
 For centrality computation we could separate individual centralities into multiple files (if they are too complex) or group them all into a single ```Centrality.py``` file as long as the file remains readable.
 
