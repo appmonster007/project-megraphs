@@ -2,18 +2,16 @@ from matplotlib import pyplot as plt
 import networkx as nx
 from scipy.io import mmread
 from scipy.sparse.coo import coo_matrix
+from scipy.sparse.linalg import eigs
+import numpy as np
+import statistics
+
 # from os import stat
 # from networkx.algorithms.components.connected import is_connected
 # from networkx.classes.function import neighbors
 # from networkx.linalg.algebraicconnectivity import fiedler_vector
 # import scipy as sp
-import networkx as nx
-from scipy.io import mmread
-from scipy.sparse.coo import coo_matrix
-from scipy.sparse.linalg import eigs
 # from numpy import linalg as LA
-import numpy as np
-import statistics
 
 
 class graphIO:
@@ -72,20 +70,14 @@ class Graph:
     
     def __init__(self, **kwargs):
         if('sparse' in kwargs):
-            self.graph = nx.from_scipy_sparse_matrix(kwargs['sparse'])
+            self.graph: nx.Graph = nx.from_scipy_sparse_matrix(kwargs['sparse'])
         elif('mtxfilepath' in kwargs):
-            self.graph = nx.from_scipy_sparse_matrix(mmread(kwargs['mtxfilepath']))
+            self.graph: nx.Graph = nx.from_scipy_sparse_matrix(mmread(kwargs['mtxfilepath']))
         else:
             raise ValueError("Provide sparse matrix or mtx file path")
             
         self.adj = nx.adjacency_matrix(self.graph)
         self.laplacian = nx.laplacian_matrix(self.graph)
-
-    # @property
-    # def __graph
-    def __setGraph(self, filepath: str):
-        # self.graph = nx.from_scipy_sparse_matrix(mmread(filepath))
-        return mmread(filepath)
 
     def draw_to_png(self, outpath: str, label: str = None):
         """
@@ -148,28 +140,34 @@ class Graph:
 
     def lfvc(self):
         if (not self.is_connected()):
-            return "Not possible"
-        fiedler_vector = nx.fiedler_vector(self.graph)
-        lfvclist = []
-        for i in self.graph.nodes(data = True):
-            lfvcthis = 0
-            for j in self.graph.neighbors(i[0]):
-                lfvcthis += (fiedler_vector[j]-fiedler_vector[i[0]])*(fiedler_vector[j]-fiedler_vector[i[0]])
-            lfvclist.append(lfvcthis)
-        return lfvclist
-
+            return []
+        # fiedler_vector = nx.fiedler_vector(self.graph)
+        # lfvclist = []
+        # for i in self.graph.nodes(data = True):
+        #     lfvcthis = 0
+        #     for j in self.graph.neighbors(i[0]):
+        #         lfvcthis += (fiedler_vector[j]-fiedler_vector[i[0]])*(fiedler_vector[j]-fiedler_vector[i[0]])
+        #     lfvclist.append(lfvcthis)
+        fv = nx.fiedler_vector(self.graph)
+        LFVC_arr = [sum([(fv[j]-fv[i[0]])*(fv[j]-fv[i[0]]) for j in self.graph.neighbors(i[0])]) for i in self.graph.nodes(data = True)]
+        return LFVC_arr
+        # return lfvclist
+        
 
     def lfvc_node(self, node):
         if (not self.is_connected()):
-            return "Not possible"
-        lfvcthis = 0
+            return 0
+        # lfvcthis = 0
         nodes = list(self.graph.nodes(data = True))
         n = nodes[node]
-        fiedler_vector = self.eigenvector_atindex(1)[0]
-        fiedler = fiedler_vector[n[0]]
-        for j in self.graph.neighbors(n[0]):
-            lfvcthis += (fiedler_vector[j]-fiedler)*(fiedler_vector[j]-fiedler)
-        return lfvcthis
+        # fiedler_vector = self.eigenvector_atindex(1)[0]
+        # fiedler = fiedler_vector[n[0]]
+        # for j in self.graph.neighbors(n[0]):
+        #     lfvcthis += (fiedler_vector[j]-fiedler)*(fiedler_vector[j]-fiedler)
+        fv = self.eigenvector_atindex(1)[0]
+        lfvc = sum([(fv[j]-fv[n[0]])*(fv[j]-fv[n[0]]) for j in self.graph.neighbors(n[0])])
+        return lfvc
+        # return lfvcthis
         
 
     def neighbourhood_hopset(self, index, k = 10):
@@ -216,3 +214,13 @@ class Graph:
         vector = np.transpose(eig_vectors)[vector_pos]
         eig_val = evr[a]
         return vector.real, eig_val
+
+
+    # def dcD_g_lfvc(self, q):
+    #     R = set()
+    #     for i in range(1,q+1):
+    #         # N: with max degree centrality
+    #         Y = nx.fiedler_vector(self.graph)
+    #         # i_star = argmax
+    #         R.union(i_star)
+    #     pass
