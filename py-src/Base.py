@@ -1,19 +1,21 @@
 from matplotlib import pyplot as plt
 import networkx as nx
+from networkx.algorithms import tree
+from networkx.classes.function import subgraph
+from numpy.core.fromnumeric import argmax
 from scipy.io import mmread
 from scipy.sparse.coo import coo_matrix
+from scipy.sparse.linalg import eigs
+import numpy as np
+from copy import deepcopy 
+import statistics
+
 # from os import stat
 # from networkx.algorithms.components.connected import is_connected
 # from networkx.classes.function import neighbors
 # from networkx.linalg.algebraicconnectivity import fiedler_vector
 # import scipy as sp
-import networkx as nx
-from scipy.io import mmread
-from scipy.sparse.coo import coo_matrix
-from scipy.sparse.linalg import eigs
 # from numpy import linalg as LA
-import numpy as np
-import statistics
 
 
 class graphIO:
@@ -72,20 +74,14 @@ class Graph:
     
     def __init__(self, **kwargs):
         if('sparse' in kwargs):
-            self.graph = nx.from_scipy_sparse_matrix(kwargs['sparse'])
+            self.graph: nx.Graph = nx.from_scipy_sparse_matrix(kwargs['sparse'])
         elif('mtxfilepath' in kwargs):
-            self.graph = nx.from_scipy_sparse_matrix(mmread(kwargs['mtxfilepath']))
+            self.graph: nx.Graph = nx.from_scipy_sparse_matrix(mmread(kwargs['mtxfilepath']))
         else:
             raise ValueError("Provide sparse matrix or mtx file path")
             
         self.adj = nx.adjacency_matrix(self.graph)
         self.laplacian = nx.laplacian_matrix(self.graph)
-
-    # @property
-    # def __graph
-    def __setGraph(self, filepath: str):
-        # self.graph = nx.from_scipy_sparse_matrix(mmread(filepath))
-        return mmread(filepath)
 
     def draw_to_png(self, outpath: str, label: str = None):
         """
@@ -131,7 +127,7 @@ class Graph:
 
 
     def eigenvector_centrality_node(self, node):
-        eigenvector , eigen_val = self.eigenvector_atindex(-1)
+        eigenvector , eigen_val = self.eigenvector_atindex(self.adj, -1)
         nodes = list(self.graph.nodes(data = True))
         n = nodes[node]
         inv = 1/eigen_val
@@ -148,28 +144,40 @@ class Graph:
 
     def lfvc(self):
         if (not self.is_connected()):
-            return "Not possible"
-        fiedler_vector = nx.fiedler_vector(self.graph)
-        lfvclist = []
-        for i in self.graph.nodes(data = True):
-            lfvcthis = 0
-            for j in self.graph.neighbors(i[0]):
-                lfvcthis += (fiedler_vector[j]-fiedler_vector[i[0]])*(fiedler_vector[j]-fiedler_vector[i[0]])
-            lfvclist.append(lfvcthis)
-        return lfvclist
+            return []
 
+        # fiedler_vector = nx.fiedler_vector(self.graph)
+        # lfvclist = []
+        # for i in self.graph.nodes(data = True):
+        #     lfvcthis = 0
+        #     for j in self.graph.neighbors(i[0]):
+        #         lfvcthis += (fiedler_vector[j]-fiedler_vector[i[0]])*(fiedler_vector[j]-fiedler_vector[i[0]])
+        #     lfvclist.append(lfvcthis)
+        # return lfvclist
+
+        fv = self.eigenvector_atindex(self.adj, 1)[0]
+        # fv = nx.fiedler_vector(self.graph)
+        LFVC_arr = [sum([(fv[j]-fv[i[0]])**2 for j in self.graph.neighbors(i[0])]) for i in self.graph.nodes(data = True)]
+        return LFVC_arr
+        
 
     def lfvc_node(self, node):
         if (not self.is_connected()):
-            return "Not possible"
-        lfvcthis = 0
+            return 0
+
         nodes = list(self.graph.nodes(data = True))
         n = nodes[node]
-        fiedler_vector = self.eigenvector_atindex(1)[0]
-        fiedler = fiedler_vector[n[0]]
-        for j in self.graph.neighbors(n[0]):
-            lfvcthis += (fiedler_vector[j]-fiedler)*(fiedler_vector[j]-fiedler)
-        return lfvcthis
+
+        # lfvcthis = 0
+        # fiedler_vector = self.eigenvector_atindex(self.adj, 1)[0]
+        # fiedler = fiedler_vector[n[0]]
+        # for j in self.graph.neighbors(n[0]):
+        #     lfvcthis += (fiedler_vector[j]-fiedler)*(fiedler_vector[j]-fiedler)
+        # return lfvcthis
+
+        fv = self.eigenvector_atindex(self.adj, 1)[0]
+        lfvc = sum([(fv[j]-fv[n[0]])**2 for j in self.graph.neighbors(n[0])])
+        return lfvc
         
 
     def neighbourhood_hopset(self, index, k = 10):
@@ -209,10 +217,46 @@ class Graph:
         return l.index(median), l.index(closest_mean), l.index(min_value), l.index(max_value)
 
 
-    def eigenvector_atindex(self, a):
-        eig_values, eig_vectors = eigs(self.adj)
+    def eigenvector_atindex(self, graph, a):
+        eig_values, eig_vectors = eigs(graph)
         evr = np.sort(eig_values.real)
         vector_pos = np.where(eig_values.real == evr[a])[0][0]
         vector = np.transpose(eig_vectors)[vector_pos]
         eig_val = evr[a]
         return vector.real, eig_val
+
+
+    def cd_g_lfvc(self, q):
+        def getLCCSubgraph(G):
+            nodes = max(nx.connected_components(G), key=len)
+            subgraph = nx.subgraph(G, list(nodes))
+            return subgraph
+
+        R = set()
+        G = deepcopy(self.graph)
+        for _ in range(1,q+1):
+            # finding largest connected component
+            lcc_sg : nx.Graph= getLCCSubgraph(G)
+
+            # corresponding fiedler vector
+            Y = self.eigenvector_atindex(nx.adjacency_matrix(lcc_sg), 1)[0]
+
+            # finding argmax 
+            k,p = {},0
+            for x in lcc_sg.nodes(data=True):
+                k[x[0]] = Y[p]
+                p+=1
+            LFVC_dict = {sum([(k[j]-k[i[0]])**2 for j in lcc_sg.neighbors(i[0])]) : i[0] for i in lcc_sg.nodes(data = True)}
+            m = max(LFVC_dict.keys())
+            i_star = LFVC_dict[m]
+
+            R.add(i_star)
+            G.remove_node(i_star)
+        
+        Vs_cap = set()
+        for x in R:
+            j = self.graph.neighbors(x)
+            Vs_cap = Vs_cap.union(j)
+
+        Vs_cap = Vs_cap.union(R)
+        return Vs_cap
