@@ -73,7 +73,9 @@ class Graph:
     """
     
     def __init__(self, **kwargs):
-        if('sparse' in kwargs):
+        if('nx_graph' in kwargs):
+            self.graph: nx.Graph = kwargs['nx_graph']
+        elif('sparse' in kwargs):
             self.graph: nx.Graph = nx.from_scipy_sparse_matrix(kwargs['sparse'])
         elif('mtxfilepath' in kwargs):
             self.graph: nx.Graph = nx.from_scipy_sparse_matrix(mmread(kwargs['mtxfilepath']))
@@ -226,9 +228,9 @@ class Graph:
         return vector.real, eig_val
 
 
-    def cd_g_lfvc(self, **kwargs):
+    def greedy_community_detection(self, **kwargs):
 
-        def node_lfvc(lcc_sg):
+        def _node_lfvc(lcc_sg):
             # corresponding fiedler vector
             Y = self.eigenvector_atindex(nx.adjacency_matrix(lcc_sg), 1)[0]
 
@@ -243,6 +245,8 @@ class Graph:
             i_star = LFVC_dict[m]
             return i_star
 
+        # TODO: add greedy function for other centralities with lcc subgraph as parameter and returns (i*) node
+
         def getLCCSubgraph(G):
             nodes = max(nx.connected_components(G), key=len)
             subgraph = nx.subgraph(G, list(nodes))
@@ -251,12 +255,12 @@ class Graph:
         q = kwargs['q']
         R = set()
         G = deepcopy(self.graph)
-        for _ in range(1,q+1):
+        for _ in range(q):
             # finding largest connected component
             lcc_sg : nx.Graph = getLCCSubgraph(G)
 
             if(kwargs['function']=='node_lfvc'):
-                i_star = node_lfvc(lcc_sg)
+                i_star = _node_lfvc(lcc_sg)
 
             R.add(i_star)
             G.remove_node(i_star)
@@ -294,6 +298,5 @@ class Graph:
                 nu = om.union(vs_cap)
                 if(len(om) > 0):
                     break
-
 
         return (om, nu)
