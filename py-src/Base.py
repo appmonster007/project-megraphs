@@ -130,13 +130,19 @@ class Graph:
 
     def eigenvector_centrality_node(self, node):
         eigenvector , eigen_val = self.eigenvector_atindex(self.adj, -1)
-        nodes = list(self.graph.nodes(data = True))
-        n = nodes[node]
+        # nodes = list(self.graph.nodes(data = True))
+        # n = nodes[node]
+        eig_dict = dict()
+        j = 0
+        for x in self.graph.nodes:
+            eig_dict[x] = eigenvector[j]
+            j+=1
+
         inv = 1/eigen_val
         centrality = 0
-        for i in self.graph.neighbors(n[0]):
-            data = self.graph.get_edge_data(i, n[0], 0)
-            centrality += data["weight"] * eigenvector[i]
+        for i in self.graph.neighbors(node):
+            data = self.graph.get_edge_data(i, node, 0)
+            centrality += data["weight"] * eig_dict[i]
         return centrality * inv
 
 
@@ -167,8 +173,8 @@ class Graph:
         if (not self.is_connected()):
             return 0
 
-        nodes = list(self.graph.nodes(data = True))
-        n = nodes[node]
+        # nodes = list(self.graph.nodes(data = True))
+        # n = nodes[node]
 
         # lfvcthis = 0
         # fiedler_vector = self.eigenvector_atindex(self.adj, 1)[0]
@@ -176,9 +182,15 @@ class Graph:
         # for j in self.graph.neighbors(n[0]):
         #     lfvcthis += (fiedler_vector[j]-fiedler)*(fiedler_vector[j]-fiedler)
         # return lfvcthis
-
+            
         fv = self.eigenvector_atindex(self.adj, 1)[0]
-        lfvc = sum([(fv[j]-fv[n[0]])**2 for j in self.graph.neighbors(n[0])])
+        fv_dict = dict()
+        i = 0
+        for x in self.graph.nodes:
+            fv_dict[x] = fv[i]
+            i+=1
+
+        lfvc = sum([(fv_dict[j]-fv_dict[node])**2 for j in self.graph.neighbors(node)])
         return lfvc
         
 
