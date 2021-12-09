@@ -163,7 +163,7 @@ class Graph:
         #     lfvclist.append(lfvcthis)
         # return lfvclist
 
-        fv = self.eigenvector_atindex(self.adj, 1)[0]
+        fv = self.eigenvector_atindex(self.laplacian, 1)[0]
         # fv = nx.fiedler_vector(self.graph)
         LFVC_arr = [sum([(fv[j]-fv[i[0]])**2 for j in self.graph.neighbors(i[0])]) for i in self.graph.nodes(data = True)]
         return LFVC_arr
@@ -183,7 +183,7 @@ class Graph:
         #     lfvcthis += (fiedler_vector[j]-fiedler)*(fiedler_vector[j]-fiedler)
         # return lfvcthis
             
-        fv = self.eigenvector_atindex(self.adj, 1)[0]
+        fv = self.eigenvector_atindex(self.laplacian, 1)[0]
         fv_dict = dict()
         i = 0
         for x in self.graph.nodes:
@@ -244,7 +244,7 @@ class Graph:
 
         def _node_lfvc(lcc_sg):
             # corresponding fiedler vector
-            Y = self.eigenvector_atindex(nx.adjacency_matrix(lcc_sg), 1)[0]
+            Y = self.eigenvector_atindex(nx.laplacian_matrix(lcc_sg), 1)[0]
 
             # finding argmax 
             k,p = {},0
