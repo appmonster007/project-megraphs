@@ -222,7 +222,7 @@ class Graph:
 
 
     def nodes_of_interest(self):
-        l = list(nx.degree_centrality(self.graph))
+        l = list(nx.degree_centrality(self.graph).values())
         mean = statistics.mean(l)
         median = statistics.median_high(l)
         closest_mean = min(l, key = lambda x:abs(x-mean))
@@ -317,5 +317,4 @@ class Graph:
                     max_link = len(om)
                     nu_r, om_r = nu, om
                         
-
         return (om_r, nu_r)
