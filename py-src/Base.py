@@ -284,23 +284,28 @@ class Graph:
         # Vs_cap = Vs_cap.union(R)
         # return Vs_cap
 
-        nu, om = set(), set()
-        cc_found = False
-        for cc in nx.connected_components(G):
-            vs_cap = list(set(cc))
-            nu, om = set(), set()
-            for x in R: 
-                found = [self.graph.has_edge(x,i) for i in vs_cap]
-                if(any(found)):
-                    om.add(x) # blue nodes
-            nu = om.union(vs_cap)
-            if (len(R) == len(om)):
-                cc_found = True
-                break
-        
-        if(not cc_found):
-            scc = sorted(nx.connected_components(G), key=len, reverse=True)
-            for cc in scc:
+        # nu, om = set(), set()
+        # cc_found = False
+        cc_list = [x for x in nx.connected_components(G)]
+        # print('#'*5, [len(x) for x in cc_list])
+        # for cc in cc_list:
+        #     if(len(cc)>1):
+        #         vs_cap = list(set(cc))
+        #         nu, om = set(), set()
+        #         for x in R: 
+        #             found = [self.graph.has_edge(x,i) for i in vs_cap]
+        #             if(any(found)):
+        #                 om.add(x) # blue nodes
+        #         nu = om.union(vs_cap)
+        #         if (len(R) == len(om)):
+        #             cc_found = True
+        #             break
+        max_link = 0
+        nu_r, om_r = set(), set()
+        # if(not cc_found):
+        scc_list = sorted(cc_list, key=len, reverse=True)
+        for cc in scc_list:
+            if(len(cc)>1):
                 vs_cap = list(set(cc))
                 nu, om = set(), set()
                 for x in R: 
@@ -308,7 +313,9 @@ class Graph:
                     if(any(found)):
                         om.add(x) # blue nodes
                 nu = om.union(vs_cap)
-                if(len(om) > 0):
-                    break
+                if(len(om) > max_link):
+                    max_link = len(om)
+                    nu_r, om_r = nu, om
+                        
 
-        return (om, nu)
+        return (om_r, nu_r)
