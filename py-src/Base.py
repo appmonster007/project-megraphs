@@ -201,6 +201,14 @@ class Graph:
         return len(nbrs)
 
 
+    def neighbourhood_hopset_graph(self, k = 10):
+        nodes = list(self.graph.nodes())
+        hopset = dict()
+        for i in nodes:
+            hopset[i] = self.neighbourhood_hopset(i, k)
+        return hopset
+
+
     def clustering_coefficient(self):
         return nx.clustering(self.graph)
 
@@ -219,6 +227,14 @@ class Graph:
                 break
         centrality =  nx.betweenness_centrality(g)
         return centrality[node]
+    
+
+    def ego_centrality(self):
+        nodes = list(self.graph.nodes())
+        ego = dict()
+        for i in nodes:
+            ego[i] = self.ego_centrality_node(i)
+        return ego
 
 
     def nodes_of_interest(self):
