@@ -1,13 +1,14 @@
 from Base import Graph
 import pandas as pd
 import csv
+import time
 import sys
 #visualization libraries, not required as such for main algorithm
 import networkx as nx
 
 
 if len(sys.argv) == 1:
-    filename = 'M_web-edu.mtx'
+    filename = 'l_tech-internet-as.mtx'
 else:
     filename = sys.argv[1]
 G1 = Graph(mtxfilepath=f'../assets/{filename}')
@@ -17,7 +18,11 @@ G1 = Graph(mtxfilepath=f'../assets/{filename}')
 # egc1 = G1.ego_centrality()
 # clc1 = G1.clustering_coefficient()
 # nhc1 = G1.neighbourhood_hopset_graph(2)
+start = time.time()
+# bc1 = nx.betweenness_centrality(G1.graph)
 pbc1 = G1.parallel_betweenness_centrality(6)
+print(f"\t\tTime: {(time.time() - start):.4F} seconds")
+
 # lfvc_val = G1.lfvc()
 csv_file = open(f'{filename}_csv', 'w')
 writer = csv.writer(csv_file)
