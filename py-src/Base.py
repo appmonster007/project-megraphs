@@ -6,6 +6,9 @@ from numpy.core.fromnumeric import argmax
 from scipy.io import mmread
 from scipy.sparse.coo import coo_matrix
 from scipy.sparse.linalg import eigs
+from multiprocessing import Pool
+import time
+import itertools
 import numpy as np
 from copy import deepcopy 
 import statistics
@@ -122,6 +125,37 @@ class Graph:
 
     def betweenness_centrality(self):
         return nx.betweenness_centrality(self.graph, k = min(self.graph.number_of_nodes() , 500))
+
+    def chunks(self, l, n):
+        l_c = iter(l)
+        while 1:
+            x = tuple(itertools.islice(l_c, n))
+            if not x:
+                return
+            yield x
+
+    def parallel_betweenness_centrality(self, processes=None):
+        p = Pool(processes=processes)
+        node_divisor = len(p._pool) * 4
+        node_chunks = list(self.chunks(self.graph.nodes(), int(self.graph.order() / node_divisor)))
+        num_chunks = len(node_chunks)
+        bt_sc = p.starmap(
+            nx.betweenness_centrality_subset,
+            zip(
+                [self.graph] * num_chunks,
+                node_chunks,
+                [list(self.graph)] * num_chunks,
+                [True] * num_chunks,
+                [None] * num_chunks,
+            ),
+        )
+
+        # Reduce the partial solutions
+        bt_c = bt_sc[0]
+        for bt in bt_sc[1:]:
+            for n in bt:
+                bt_c[n] += bt[n]
+        return bt_c        
 
 
     def eigenvector_centrality(self):
