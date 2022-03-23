@@ -1,10 +1,10 @@
-from locale import normalize
+import random
 import sys
 import math
-from turtle import clear
-from matplotlib.pyplot import grid
 import networkx
 from Base import graphIO
+
+from typing import List
 
 def entropy(sample: list):
     distribution = {}
@@ -26,12 +26,14 @@ def degreeEntropy(graph: networkx.Graph):
     ent = entropy(degrees)
     return ent
 
-# Let us assume the rentopy only considers few nodes
-def random_degree_entropy(graph: networkx.Graph):
+# Let us assume the entropy only considers few nodes
+def random_degree_entropy(graph: networkx.Graph, observation_nodes: List[int]):
     degrees = networkx.degree(graph)
     degrees = list(map(lambda x: x[1], degrees))
-    degrees = degrees[1:10]
-    ent = entropy(degrees)
+    observed: List[int] = []
+    for node in observation_nodes:
+        observed.append(degrees[node])
+    ent = entropy(observed)
     return ent
 
 
@@ -47,14 +49,24 @@ def test():
     print(f"[INFO] file read complete")
     networkx_graph = graph.graph
     print(f"[INFO] extracted graph")
-    original_entropy = betweenness_entropy(networkx_graph)
+
+    # Select nodes to observe
+    observation_nodes = [];
+    NODES_OF_INTEREST_COUNT = 20;
+    for _ in range(NODES_OF_INTEREST_COUNT):
+        observation_nodes.append(random.randint(0, len(networkx_graph.nodes)))
+    print(f"Observation Set = {observation_nodes}")
+
+    # Store the original entropy as measured by random sample
+    original_entropy = random_degree_entropy(networkx_graph, observation_nodes)
     print(f"Original Entropy = {original_entropy:.2f}")
+    
 
     
     for node in networkx_graph:
         copy = networkx_graph.copy()
         copy.remove_node(node)
-        copy_entropy = betweenness_entropy(copy)
+        copy_entropy = random_degree_entropy(copy, observation_nodes)
         print(f"Node: {(node + 1):02}\tDegree: {networkx.degree(networkx_graph, node)} \tDelta H: {(original_entropy - copy_entropy):.2f}\tH after removal: {copy_entropy:.2f}")
     
         
