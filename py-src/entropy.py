@@ -27,13 +27,14 @@ def degreeEntropy(graph: networkx.Graph):
     return ent
 
 # Let us assume the entropy only considers few nodes
+# TODO: move sampling logic into this function
 def random_degree_entropy(graph: networkx.Graph, observation_nodes: List[int]):
     degrees = networkx.degree(graph)
     degrees = list(map(lambda x: x[1], degrees))
-    observed: List[int] = []
+    observed_degrees: List[int] = []
     for node in observation_nodes:
-        observed.append(degrees[node])
-    ent = entropy(observed)
+        observed_degrees.append(degrees[node])
+    ent = entropy(observed_degrees)
     return ent
 
 
@@ -52,9 +53,9 @@ def test():
 
     # Select nodes to observe
     observation_nodes = [];
-    NODES_OF_INTEREST_COUNT = 20;
+    NODES_OF_INTEREST_COUNT = len(networkx_graph.nodes) // 10
     for _ in range(NODES_OF_INTEREST_COUNT):
-        observation_nodes.append(random.randint(0, len(networkx_graph.nodes)))
+        observation_nodes.append(random.randint(0, len(networkx_graph.nodes) - 1))
     print(f"Observation Set = {observation_nodes}")
 
     # Store the original entropy as measured by random sample
@@ -67,7 +68,7 @@ def test():
         copy = networkx_graph.copy()
         copy.remove_node(node)
         copy_entropy = random_degree_entropy(copy, observation_nodes)
-        print(f"Node: {(node + 1):02}\tDegree: {networkx.degree(networkx_graph, node)} \tDelta H: {(original_entropy - copy_entropy):.2f}\tH after removal: {copy_entropy:.2f}")
+        print(f"Node: {(node + 1):02}\tDegree: {networkx.degree(networkx_graph, node)} \tDelta H: {(original_entropy - copy_entropy):.3f}\tH after removal: {copy_entropy:.2f}")
     
         
 
