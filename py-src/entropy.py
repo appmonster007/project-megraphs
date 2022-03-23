@@ -26,6 +26,15 @@ def degreeEntropy(graph: networkx.Graph):
     ent = entropy(degrees)
     return ent
 
+# Let us assume the rentopy only considers few nodes
+def random_degree_entropy(graph: networkx.Graph):
+    degrees = networkx.degree(graph)
+    degrees = list(map(lambda x: x[1], degrees))
+    degrees = degrees[1:10]
+    ent = entropy(degrees)
+    return ent
+
+
 def betweenness_entropy(graph: networkx.Graph):
     betweennesses = networkx.betweenness_centrality(graph, normalized=False)
     betweennesses = list(dict(betweennesses).values())
