@@ -60,11 +60,11 @@ def random_degree_entropy(graph: networkx.Graph,nodes_of_interest_count = 0):
         
     # degrees = [x[1] for x in degrees]
     # print(degrees_dict)
-    observed_degrees: List[int] = []
-    for node in observation_nodes:
-        observed_degrees.append(degrees_dict[node])
-    ent = entropy(observed_degrees)
-    return ent
+    # observed_degrees: List[int] = []
+    # for node in observation_nodes:
+    #     observed_degrees.append(degrees_dict[node])
+    # ent = entropy(observed_degrees)
+    # return ent
 
 
 def betweenness_entropy(graph: networkx.Graph):
@@ -74,10 +74,15 @@ def betweenness_entropy(graph: networkx.Graph):
     return ent
 
 def random_sample_entropy(graph,nodes_of_interest_count=0,iteration_count=0,centrality_func = random_degree_entropy):
-    ent_list=[]
     for _ in range(iteration_count):
-        ent_list.append(np.array(centrality_func(graph,nodes_of_interest_count)))
-    return sum(ent_list)/len(ent_list)
+        centrality_func(graph,nodes_of_interest_count)
+    total = sum(prob_dict.values(), 0.0)
+    a = {k: v / total for k, v in prob_dict.items()}
+    # print("normalised: ",a)
+    apna_ent=0
+    for probability in a.values():
+        apna_ent += probability * math.log2(probability)
+    return apna_ent * -1
     
 
 def test():
@@ -99,7 +104,7 @@ def test():
 
     # Store the original entropy as measured by random sample
     # original_entropy = random_degree_entropy(networkx_graph)
-    original_entropy = random_sample_entropy(networkx_graph,iteration_count=30)
+    original_entropy = random_sample_entropy(networkx_graph,iteration_count=100)
     print(f"Original Entropy = {original_entropy:.2f}")
     proper_original_entropy = degreeEntropy(networkx_graph)
     print(f"Actual Entropy = {proper_original_entropy:.2f}")
@@ -109,13 +114,7 @@ def test():
     #     copy_entropy = degreeEntropy(copy)
     #     print(f"Node: {(node + 1):02}\tDegree: {networkx.degree(networkx_graph, node)} \tDelta H: {(original_entropy - copy_entropy):.3f}\tH after removal: {copy_entropy:.2f}")
     # print("Prob dict: ",prob_dict)
-    total = sum(prob_dict.values(), 0.0)
-    a = {k: v / total for k, v in prob_dict.items()}
-    # print("normalised: ",a)
-    apna_ent=0
-    for probability in a.values():
-        apna_ent += probability * math.log2(probability)
-    print("our ent: ",apna_ent)
+    
         
 
 test()
