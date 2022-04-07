@@ -1,5 +1,6 @@
 import random
 import sys
+import scipy
 import math
 import networkx
 import numpy as np
@@ -83,7 +84,18 @@ def random_sample_entropy(graph,nodes_of_interest_count=0,iteration_count=0,cent
     for probability in a.values():
         apna_ent += probability * math.log2(probability)
     return apna_ent * -1
-    
+
+def laplacian_matrix(graph: networkx.Graph):
+    # l=laplacian(graph)
+    l = networkx.laplacian_matrix(graph).toarray()
+    # laplacian log
+    # print(l.shape,np.log(l).shape)
+    # print(min(l))
+    val = np.matmul(l,scipy.linalg.logm(l))
+    # print(type(val[0][0]))
+    trace_l = np.trace(val)
+    return np.absolute(trace_l)
+
 
 def test():
     #permutation stuff
@@ -117,7 +129,7 @@ def test():
     
         
 
-test()
+# test()
 def testSubsetRandom(graph: networkx.Graph):
     degrees = networkx.degree(graph)
     degrees = list(map(lambda x: x[1], degrees))
@@ -130,6 +142,6 @@ def testSubsetRandom(graph: networkx.Graph):
     print("entropy: {0}, actual entropy: {1}".format(ent/count,degreeEntropy(graph)))
 
 
-# graph = graphIO()
-# graph.read_from_mtx_file(sys.argv[1])
-# testSubsetRandom(graph.graph)
+graph = graphIO()
+graph.read_from_mtx_file(sys.argv[1])
+print(laplacian_matrix(graph.graph))
