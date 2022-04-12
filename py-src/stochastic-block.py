@@ -4,9 +4,40 @@ import matplotlib.pyplot as plt
 import scipy
 import scipy.io
 
-NO_OF_COMMUNITY=50
+import math
+import time
+import random
 
+
+def poisson_noise():
+    INTERVAL = .0005
+    LAMBDA = 10.0
+    events = {}
+
+    def f(x, L):
+      return 1 - math.exp(-L * x)
+
+
+    start = time.time()
+
+    while time.time() - start < 60:
+      if random.random() < f(INTERVAL, LAMBDA):
+        bucket = time.time() - start
+        if bucket in events.keys():
+            events[bucket] += 1
+        else:
+            events[bucket] = 1
+      time.sleep(INTERVAL)
+
+    print(events)
+    return events
+
+
+
+NO_OF_COMMUNITY=50
 sizes = np.random.randint(200,300, NO_OF_COMMUNITY)
+sizes = np.random.randint(100,300, 20)
+
 p = []
 for i in range(0, NO_OF_COMMUNITY):
     t = []
