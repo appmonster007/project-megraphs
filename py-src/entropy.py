@@ -1,13 +1,13 @@
 import random
 import sys
+import time
 import scipy
 import math
 import networkx
 import numpy as np
 from Base import graphIO
 from itertools import combinations
-
-from typing import List
+import pandas as pd
 
 prob_dict = {}
 
@@ -159,4 +159,25 @@ def testSubsetRandom(graph: networkx.Graph):
 
 graph = graphIO()
 graph.read_from_mtx_file(sys.argv[1])
-print(laplacian_matrix(graph.graph))
+# print(laplacian_matrix(graph.graph))
+
+def Stats(graph: networkx.Graph, iteration: int):
+    n = graph.number_of_nodes()
+    sizes = [int(math.sqrt(n)), int(math.pow(n, .3333)), int(math.pow(n, .25)), n//100, 0]
+    column_tags = ["sqrt","cube root","4th root","1%","standard"]
+    stat_df = pd.DataFrame(columns = column_tags)
+    for _ in range(iteration):
+        lst = [random_sample_entropy(graph,sizes[i],30) for i in range(len(sizes))]
+        #print(lst)
+        # stat_df.append(dic,ignore_index=True)
+        stat_df.loc[len(stat_df)] = lst
+    stat_df.to_excel('trial.xlsx')
+start = time.time()
+Stats(graph.graph,1000)
+end = time.time()
+print(end-start)
+
+        
+            
+        
+
