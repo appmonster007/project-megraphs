@@ -10,8 +10,9 @@ from multiprocessing import Pool
 import time
 import itertools
 import numpy as np
-from copy import deepcopy 
+from copy import deepcopy
 import statistics
+import math
 
 # from os import stat
 # from networkx.algorithms.components.connected import is_connected
@@ -79,9 +80,9 @@ class Graph:
         if('nx_graph' in kwargs):
             self.graph: nx.Graph = kwargs['nx_graph']
         elif('sparse' in kwargs):
-            self.graph: nx.Graph = nx.from_scipy_sparse_matrix(kwargs['sparse'])
+            self.graph: nx.Graph = nx.from_scipy_sparse_array(kwargs['sparse'])
         elif('mtxfilepath' in kwargs):
-            self.graph: nx.Graph = nx.from_scipy_sparse_matrix(mmread(kwargs['mtxfilepath']))
+            self.graph: nx.Graph = nx.from_scipy_sparse_array(mmread(kwargs['mtxfilepath']))
         else:
             raise ValueError("Provide sparse matrix or mtx file path")
             
@@ -122,9 +123,11 @@ class Graph:
     def closeness_centrality_node(self, node):
         return nx.closeness_centrality(self.graph, node)
 
+    def betweenness_centrality_sample(self, k):
+        return nx.betweenness_centrality(self.graph, k =k)
 
     def betweenness_centrality(self):
-        return nx.betweenness_centrality(self.graph, k = min(self.graph.number_of_nodes() , 500))
+        return nx.betweenness_centrality(self.graph, k = math.floor(math.sqrt(self.graph.number_of_nodes())))
 
     def chunks(self, l, n):
         l_c = iter(l)

@@ -1,5 +1,6 @@
 build
 src/include/Eigen
+assets/visuals/*
 
 # Editor configuration idrectory
 .vscode
@@ -9,6 +10,7 @@ src/include/Eigen
 
 # Python3 virtual environment
 venv
+.venv
 meg-env
 
 __pycache__
