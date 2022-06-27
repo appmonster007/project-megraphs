@@ -4,6 +4,7 @@ import networkx as nx
 from scipy.io import mmread
 import sys
 from typing import DefaultDict, Dict, Any, Set
+import math
 
 """
 Implementing algorithms for selecting nodes which are evenly dispersed throughout the graph
@@ -16,7 +17,7 @@ def select(g: nx.Graph, selection_fraction: int):
 
     shortest_paths = {}
     seed = random.sample(list(g.nodes), 1)[0]
-    print(seed)
+    # print(seed)
     
     for _ in range(int(len(g.nodes) * selection_fraction)):
         # Generate single source shortest paths
@@ -46,25 +47,38 @@ def select(g: nx.Graph, selection_fraction: int):
         selected.add(old_seed)
         g.remove_node(old_seed)
 
-    return selected
+    return selected, shortest_paths
+
+def sampled_betweenness_centrality(g: nx.Graph, selection_fraction: int):
+    selected, shortest_paths = select(g, selection_fraction)
+    betweenness: Dict[Any, int] = {}
+
+    for start_node in shortest_paths.keys():
+        for end_node in shortest_paths[start_node].keys():
+            
+            if start_node == end_node: continue
+
+            path = shortest_paths[start_node][end_node]
+            for node in path: 
+                if node in betweenness.keys():
+                    betweenness[node] += 1 / (len(selected) * len(g.nodes))
+                else:
+                    betweenness[node] = 1 / (len(selected) * len(g.nodes))
+    
+    return betweenness
 
 def test():
     print(f"reading {sys.argv[1]}")
     graph = nx.from_scipy_sparse_matrix(mmread(sys.argv[1]))
-    chosen_nodes = select(graph, 0.2)
-    print(chosen_nodes)
+    size_of_graph = len(graph.nodes)
+    # chosen_nodes, _ = select(graph, 0.2)
+    # print(chosen_nodes)
 
-    sum_shortest_paths = 0
-    count = 0
-    for node in chosen_nodes:
-        for other in chosen_nodes:
-            if node != other:
-                sum_shortest_paths += nx.shortest_path_length(graph, node, other)
-                count += 1
+    sb = sampled_betweenness_centrality(graph,  10/size_of_graph)
+    print(sb[15] / sb[0])
 
-    print(f"Average shortest path = {sum_shortest_paths / count}")
-    print(f"diameter of graph = {nx.diameter(graph)}")
-
+    b = nx.betweenness_centrality(graph, 10)
+    print(b[15] / b[0])
     # nx.draw(graph, with_labels=True)
 
 test()
