@@ -43,6 +43,9 @@ def select(g: nx.Graph, selection_fraction: int):
             [to_node for to_node in rolling_distances.keys()], 
             key= lambda node: rolling_distances[node]
         )
+        possible_seed = [s for s in rolling_distances.keys() if rolling_distances[s] == rolling_distances[seed]]
+        # print(f"possible seeds = {possible_seed}")
+        seed = random.sample(possible_seed, 1)[0]
         # print(f"Updated seed to {seed}")
         selected.add(old_seed)
         g.remove_node(old_seed)
@@ -74,10 +77,10 @@ def test():
     # chosen_nodes, _ = select(graph, 0.2)
     # print(chosen_nodes)
 
-    sb = sampled_betweenness_centrality(graph,  10/size_of_graph)
+    sb = sampled_betweenness_centrality(graph,  1/math.sqrt(size_of_graph))
     print(sb[15] / sb[0])
 
-    b = nx.betweenness_centrality(graph, 10)
+    b = nx.betweenness_centrality(graph, int(math.sqrt(size_of_graph)))
     print(b[15] / b[0])
     # nx.draw(graph, with_labels=True)
 
