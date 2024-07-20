@@ -79,9 +79,9 @@ class Graph:
         if('nx_graph' in kwargs):
             self.graph: nx.Graph = kwargs['nx_graph']
         elif('sparse' in kwargs):
-            self.graph: nx.Graph = nx.from_scipy_sparse_matrix(kwargs['sparse'])
+            self.graph: nx.Graph = nx.from_scipy_sparse_array(kwargs['sparse'])
         elif('mtxfilepath' in kwargs):
-            self.graph: nx.Graph = nx.from_scipy_sparse_matrix(mmread(kwargs['mtxfilepath']))
+            self.graph: nx.Graph = nx.from_scipy_sparse_array(mmread(kwargs['mtxfilepath']))
         else:
             raise ValueError("Provide sparse matrix or mtx file path")
             
