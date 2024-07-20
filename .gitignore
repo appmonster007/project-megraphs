@@ -10,6 +10,7 @@ assets/visuals/*
 
 # Python3 virtual environment
 venv
+.venv
 meg-env
 
 __pycache__
