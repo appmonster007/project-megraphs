@@ -8,7 +8,7 @@ import networkx as nx
 
 
 if len(sys.argv) == 1:
-    filename = 'l_tech-internet-as.mtx'
+    filename = 'L_tech-internet-as.mtx'
 else:
     filename = sys.argv[1]
 G1 = Graph(mtxfilepath=f'../assets/{filename}')
@@ -18,27 +18,67 @@ G1 = Graph(mtxfilepath=f'../assets/{filename}')
 # egc1 = G1.ego_centrality()
 # clc1 = G1.clustering_coefficient()
 # nhc1 = G1.neighbourhood_hopset_graph(2)
-start = time.time()
-# bc1 = nx.betweenness_centrality(G1.graph)
-pbc1 = G1.parallel_betweenness_centrality(6)
-print(f"\t\tTime: {(time.time() - start):.4F} seconds")
+
 
 # lfvc_val = G1.lfvc()
 csv_file = open(f'{filename}_csv', 'w')
 writer = csv.writer(csv_file)
 len = G1.graph.number_of_nodes()
 print(len)
-for i in range(0, len):
-    row = []
-    row.append(i)
-    # row.append(dc1[i])
-    # row.append(ec1[i])
-    # row.append(lfvc_val[i])
-    # row.append(clc1[i])
-    # row.append(egc1[i])
-    # row.append(nhc1[i])
-    #betweenness is commented out for now
-    # row.append(bc1[i])
-    row.append(pbc1[i])
-    writer.writerow(row)
-# print(type(bc))
+
+import os
+
+csv_file = open('data_csv', 'w')
+writer = csv.writer(csv_file)
+writer.writerow(['Nodes','Normal Betweenness','Custom Betweenness','Degree', 'Closeness'])
+
+reddit_file_director = '../assets/reddit_threads'
+directory = os.fsencode(reddit_file_director)
+    
+for file in os.listdir(directory):
+    print(directory.decode('UTF-8') + '/' + file.decode('UTF-8'))
+    G1 = Graph(mtxfilepath=directory.decode('UTF-8') + '/' + file.decode('UTF-8'))
+    start = time.thread_time_ns()
+    bc1 = nx.betweenness_centrality(G1.graph)
+    print(f"\t\tNumber of edges:{G1.graph.number_of_edges()} and nodes:{G1.graph.number_of_nodes()}")
+    normal_b = (time.thread_time_ns() - start)
+    print(f"\t\tTime normal algorithm: {normal_b:.4F} nano seconds")
+    start = time.thread_time_ns()
+    rbc1 = G1.betweenness_centrality()
+    random_b = (time.thread_time_ns() - start)
+    print(f"\t\tTime custom algorithm: {random_b:.4F} nano seconds")
+    start = time.thread_time_ns()
+    dbc1 = G1.degree_centrality()
+    degree = (time.thread_time_ns() - start)
+    print(f"\t\tTime degree algorithm: {degree:.4F} nano seconds")
+    start = time.thread_time_ns()
+    cc1 = G1.closeness_centrality()
+    closess = (time.thread_time_ns() - start)
+    print(f"\t\tTime closeness algorithm: {closess:.4F} nano seconds")
+    writer.writerow([G1.graph.number_of_nodes(),normal_b,random_b,degree, closess])
+
+
+reddit_file_director = '../assets/proteins'
+directory = os.fsencode(reddit_file_director)
+    
+for file in os.listdir(directory):
+    print(directory.decode('UTF-8') + '/' + file.decode('UTF-8'))
+    G1 = Graph(mtxfilepath=directory.decode('UTF-8') + '/' + file.decode('UTF-8'))
+    start = time.thread_time_ns()
+    bc1 = nx.betweenness_centrality(G1.graph)
+    print(f"\t\tNumber of edges:{G1.graph.number_of_edges()} and nodes:{G1.graph.number_of_nodes()}")
+    normal_b = (time.thread_time_ns() - start)
+    print(f"\t\tTime normal algorithm: {normal_b:.4F} nano seconds")
+    start = time.thread_time_ns()
+    rbc1 = G1.betweenness_centrality()
+    random_b = (time.thread_time_ns() - start)
+    print(f"\t\tTime custom algorithm: {random_b:.4F} nano seconds")
+    start = time.thread_time_ns()
+    dbc1 = G1.degree_centrality()
+    degree = (time.thread_time_ns() - start)
+    print(f"\t\tTime degree algorithm: {degree:.4F} nano seconds")
+    start = time.thread_time_ns()
+    cc1 = G1.closeness_centrality()
+    closess = (time.thread_time_ns() - start)
+    print(f"\t\tTime closeness algorithm: {closess:.4F} nano seconds")
+    writer.writerow([G1.graph.number_of_nodes(),normal_b,random_b,degree, closess])

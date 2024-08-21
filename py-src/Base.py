@@ -10,8 +10,9 @@ from multiprocessing import Pool
 import time
 import itertools
 import numpy as np
-from copy import deepcopy 
+from copy import deepcopy
 import statistics
+import math
 
 # from os import stat
 # from networkx.algorithms.components.connected import is_connected
@@ -122,9 +123,11 @@ class Graph:
     def closeness_centrality_node(self, node):
         return nx.closeness_centrality(self.graph, node)
 
+    def betweenness_centrality_sample(self, k):
+        return nx.betweenness_centrality(self.graph, k =k)
 
     def betweenness_centrality(self):
-        return nx.betweenness_centrality(self.graph, k = min(self.graph.number_of_nodes() , 500))
+        return nx.betweenness_centrality(self.graph, k = math.floor(math.sqrt(self.graph.number_of_nodes())))
 
     def chunks(self, l, n):
         l_c = iter(l)
